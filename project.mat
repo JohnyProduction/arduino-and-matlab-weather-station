@@ -1,0 +1,91 @@
+function varargout = lmtemp2(varargin) 
+gui_Singleton = 1; 
+gui_State = struct('gui_Name', mfilename, ...
+ gui_Singleton', gui_Singleton, ...
+'gui_OpeningFcn', @lmtemp2_OpeningFcn, ...
+'gui_OutputFcn', @lmtemp2_OutputFcn, ...
+'gui_LayoutFcn', [] , ...
+'gui_Callback', []); 
+if nargin && ischar(varargin{1}) 
+ gui_State.gui_Callback = str2func(varargin{1}); 
+end
+if nargout 
+ [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:}); 
+else
+ gui_mainfcn(gui_State, varargin{:}); 
+end
+function lmtemp2_OpeningFcn(hObject, ~, handles, varargin) 
+handles.output = hObject; 
+guidata(hObject, handles); 
+set(handles.date_box,'String',date); 
+function varargout = lmtemp2_OutputFcn(~, ~, handles) 
+varargout{1} = handles.output; 
+clear all; 
+function edit1_Callback(~, ~, ~) 
+function edit1_CreateFcn(hObject, ~, ~) 
+if ispc && isequal(get(hObject,'BackgroundColor'), 
+get(0,'defaultUicontrolBackgroundColor')) 
+ set(hObject,'BackgroundColor','white'); 
+end
+function pushbutton1_Callback(hObject, eventdata, handles) 
+x = 0; 
+y = 0; 
+z = 0; 
+go = true; 
+device = serialport("COM7",115200); 
+a=readline(device); 
+readline(device); 
+while go 
+ b=readline(device); 
+ pat = ": "| lettersPattern; 
+ values = split(b,pat); 
+ values = values(strlength(values) > 0); 
+ press = str2double(values(2))/100; 
+ temp = str2double(values(3)); 
+ hydro = str2double(values(4)); 
+ disp(press); 
+ disp(temp); 
+ disp(hydro); 
+ x = [x temp]; 
+ y = [y hydro]; 
+ z = [z press]; 
+ plot(handles.axes1,x,'r-'); 
+ set(handles.edit1,'String',num2str(temp)+ " C"); 
+ grid; 
+ drawnow; 
+ plot(handles.axes2,y,'b--'); 
+ set(handles.edit2,'String',num2str(hydro)); 
+ grid; 
+ drawnow; 
+ plot(handles.axes3,z,'ms'); 
+ set(handles.edit4,'String',num2str(press)+" hPa"); 
+ pause(1); 
+ if hydro>500 
+ set(handles.weather,"String","Ulewa"); 
+ elseif hydro<=500 && hydro>300 
+ set(handles.weather,"String","Deszcz"); 
+ else
+ set(handles.weather,"String","Pogodnie"); 
+ end
+end
+guidata(hObject,handles); 
+function edit2_Callback(hObject, eventdata, handles) 
+function edit2_CreateFcn(hObject, eventdata, handles) 
+if ispc && isequal(get(hObject,'BackgroundColor'), 
+get(0,'defaultUicontrolBackgroundColor')) 
+ set(hObject,'BackgroundColor','white'); 
+end
+function datebox_Callback(hObject, eventdata, handles) 
+function datebox_CreateFcn(hObject, eventdata, handles) 
+if ispc && isequal(get(hObject,'BackgroundColor'), 
+get(0,'defaultUicontrolBackgroundColor')) 
+ set(hObject,'BackgroundColor','white'); 
+end
+ 
+function edit4_Callback(hObject, eventdata, handles) 
+function edit4_CreateFcn(hObject, eventdata, handles) 
+if ispc && isequal(get(hObject,'BackgroundColor'), 
+get(0,'defaultUicontrolBackgroundColor')) 
+ set(hObject,'BackgroundColor','white'); 
+end 
+function checkbox1_Callback(hObject, eventdata, handles) 
